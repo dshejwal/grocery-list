@@ -20,6 +20,7 @@ function createListFunc (){
     function myFunction(item, index) {
         listElement += `<li><input type='text' value='${item}' readonly/> <span class='fa fa-trash-o' onclick='closeFunct(${index})'></span> <span class='fa fa-pencil'></span></li>`
     }
+    
     listParent.innerHTML = listElement;
 }
 
