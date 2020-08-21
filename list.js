@@ -1,6 +1,8 @@
 const listParent = document.querySelector('#myUL');
+const liNode = document.createElement('LI');
+const inputNote = document.createElement('input');
 const spanDelete = document.createElement('span');
-spanDelete.className = "fa fa-trash-o";
+const spanEdit = document.createElement('span');
 
 //Store data 
 var dataList = [];
@@ -13,25 +15,34 @@ if( Array.isArray(getDataList) ) {
 
 //Create list Element
 function createListFunc (){
-    let listElement = '';
 
-    dataList.forEach(myFunction);
+    let listElement = '';
+    
+    dataList.forEach(myFunction);    
 
     function myFunction(item, index) {
-        listElement += `<li><input type='text' value='${item}' readonly/> <span class='fa fa-trash-o' onclick='closeFunct(${index})'></span> <span class='fa fa-pencil'></span></li>`
+        liNode.appendChild(inputNote);
+        inputNote.type = 'text';
+        inputNote.setAttribute("readonly", 'readonly');
+        inputNote.setAttribute("value", item);
+        liNode.appendChild(spanDelete);
+        spanDelete.className = "fa fa-trash-o delete-item";
+        spanDelete.setAttribute("onclick", `closeFunct(${index})`);
+        liNode.appendChild(spanEdit);
+        spanEdit.className = "fa fa-pencil edit-item";
+        spanEdit.setAttribute("onclick", `editFunct(${index})`);    
+        listElement += liNode.outerHTML;
     }
-    
+
     listParent.innerHTML = listElement;
 }
-
 createListFunc();
 
 //Add item in list
-const addBtn = document.querySelector('.addBtn');
+const addBtn = document.querySelector('#add-btn');
 addBtn.addEventListener('click', addFuncList);
 
 function addFuncList(){
-
     //Input value get
     let inputValue = document.querySelector('#myInput').value;
 
@@ -39,11 +50,15 @@ function addFuncList(){
     if(inputValue === ''){
         alert(`Please enter the value`);
     } else {
-        alert(`Successfully Added : ${inputValue}`);
-        dataList.push(inputValue);
-        localStorage.setItem('myDataList', JSON.stringify(dataList));
-        document.getElementById('myInput').value = '';
-        createListFunc();
+        if( dataList.indexOf(inputValue) == -1){
+            alert(`Successfully Added : ${inputValue}`);
+            dataList.push(inputValue);
+            localStorage.setItem('myDataList', JSON.stringify(dataList));
+            document.getElementById('myInput').value = '';
+            createListFunc();
+        } else {
+            alert(`${inputValue} : Dublicate this item. please enter new item`);
+        }
     }
 }
 
@@ -54,6 +69,23 @@ function closeFunct(index) {
     event.target.parentElement.remove();    
 }
 
+// Edit signle item.
+function editFunct(index){
+    let editItem = event.target.parentElement.children[0];
+
+    if(event.target.className == 'fa fa-pencil'){  
+        editItem.removeAttribute("readonly");
+        editItem.className = "input-edit";
+        event.target.className = "fa fa-check";
+    } else {
+        event.target.className = "fa fa-pencil";
+        editItem.removeAttribute('class');
+        editItem.setAttribute("readonly", 'readonly');
+        dataList.splice(index, 1, editItem.value);
+        localStorage.setItem('myDataList', JSON.stringify(dataList));
+    }
+}
+
 //Clear all items
 function clearAllFunc(){
     if(confirm('Clear All Items?')){
@@ -61,3 +93,4 @@ function clearAllFunc(){
         listParent.innerHTML = '';
     }
 }
+
